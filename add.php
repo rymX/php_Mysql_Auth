@@ -3,7 +3,7 @@
 
 include('config/db_connect.php');
 
- $name = $lastname = $email = $password ="";
+ $name = $lastname = $email = $password = $hashedpwd= "";
 $errors  = array('name'=>'','lastname'=>'','email'=>'', 'password'=> '') ;
 if (isset($_GET['submit'])){
    
@@ -24,7 +24,14 @@ if (isset($_GET['submit'])){
     }
     else{
         //echo htmlspecialchars( $_GET['password']) ;
+
         $password  = $_GET['password'];
+        echo $password; 
+        echo "<br>";
+        $hashedpwd = password_hash($password, PASSWORD_DEFAULT);
+        echo $hashedpwd ;
+        echo "<b>";
+
     }
     if (empty($_GET['name'])){
         $errors['name'] = 'name is require';
@@ -43,11 +50,11 @@ if (isset($_GET['submit'])){
 
     if (!array_filter($errors)){
 
-            $sql = "INSERT INTO user(name,lastname,email,password) VALUES ('$name' ,'$lastname', '$email', '$password')";
+            $sql = "INSERT INTO user(name,lastname,email,password,image) VALUES ('$name' ,'$lastname', '$email', '$hashedpwd','assets/picture.png')";
             if (mysqli_query($connection, $sql)){
                 header('Location: index.php');  
             }
-            else  { echo 'connection error : ' . mysqli_connect_error();
+            else  { echo 'connection error : ' . mysqli_error($connection);
             }
 
        
@@ -63,7 +70,7 @@ if (isset($_GET['submit'])){
  <section class="container grey-text">
   <h4 class="center"> Register here </h4>
   <div class="center">
-    <form class="white" action="add.php" methode="GET" >
+    <form class="white" action="add.php" method="GET" >
 
       <label for="name">name </label>
       <input type="text" name="name" value="<?php echo $name ?>">

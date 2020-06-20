@@ -2,18 +2,23 @@
 <?php
 include('config/db_connect.php');
 session_start();
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'] ?? "";
 
 
 if(isset($user_id)){
 
   $id= $user_id ;
-  $sql ="SELECT name, lastname, email  FROM user where id = '$id'";
+  $sql ="SELECT name, lastname, email, image  FROM user where id = '$id'";
   $res = mysqli_query($connection, $sql);
   $user= mysqli_fetch_assoc($res);
   
   mysqli_free_result($res);
   //mysqli_close($connection);
+  }
+  if (isset($_GET['sign_out'])){
+    session_unset();
+   // unset($_SESSION['user_id']);
+    header('location : index.php');
   }
 
 if (isset($_GET['submit'])){
@@ -33,19 +38,28 @@ if ( isset($_POST['upload'])){
  
   $file = $_FILES['image'];
   $fileName=$_FILES['image']['name'];
-  $fileType=$_FILES['image']['type'];
+ 
   $fileTmp_name=$_FILES['image']['tmp_name'];
-  $fileSize=$_FILES['image']['size'];
+ 
   $fileError=$_FILES['image']['error'];
-  $fileDestination= 'assets/'.$fileName ;
-  move_uploaded_file($fileTmp_name , $fileDestination);
-  
-  print_r($file);
+
+  $Ext = explode('.' , $fileName);
+
+  $fileExt = strtolower(end($Ext));
+
+  $allowd = ['png','jpg','jpeg'];
+    if(in_array($fileExt , $allowd)) {
+      if ($fileError ===0){
+        $fileDestination= 'assets/'.$fileName ;
+        move_uploaded_file($fileTmp_name , $fileDestination);
+
+        $sql="UPDATE user SET image ='$fileDestination' WHERE id = '$user_id'";
+        $result = mysqli_query($connection , $sql);
+        echo 'test';
+      }
+    }
   
 }
-
-
-
 
 ?>
 
@@ -55,7 +69,7 @@ if ( isset($_POST['upload'])){
             <h4 class="center grey-text"> Welcome</h4>
             <div style="max-width :500px" class="container">
          <div class="card z-depth-0">
-         <img src="assets/picture.png"  class="picture">
+         <img src= "<?php echo $fileDestination ?? $user['image'] ?>"" class="picture">
 
          <form class="update" action="profile.php" method="POST" enctype="multipart/form-data">
          <input type="file" name="image" id="image">
@@ -73,24 +87,28 @@ if ( isset($_POST['upload'])){
             <div> <?php echo htmlspecialchars($user['email'] ?? 'User email' )  ;?> </div>
             </div>
             <div class="card-action right-align ">
-            <!-- <a href="index.php" class="brand-text"> sign out</a> -->
+          
+          <form action="profile.php" method="GET">
+          <input  type="submit" class="btn brand z-depth-0" name="sign_out" value="SIGN OUT">
+          </form>
+            
 
-            <!-- <form action="profile.php" methode="GET">
-            <input type="hidden" name="delete" value="<?php echo $id?>">
-            <input class="btn danger z-depth-0" type="submit" name="submit" value="DELETE ACCOUNT">
-            </form> -->
+              <form action="profile.php" methode="GET">
+              <input type="hidden" name="delete" value="<?php echo $id?>">
+              <input class="btn danger z-depth-0" type="submit" name="submit" value="DELETE ACCOUNT">
+              
+              </form>
             
 
 
 
-                            </div>
-                        </div>
-                </div>
+              </div>
+           </div>
+       </div>
 
 
-               <?php include('templates/footer.php') ?>
-               
-               </html>
+<?php include('templates/footer.php') ?>
+</html>
                
                 
 

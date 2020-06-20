@@ -4,28 +4,32 @@ include('config/db_connect.php');
 
 
 
+
 $errors = '' ;
 if (isset($_GET['submit'])){
     $email =$_GET['email'];
     $password =$_GET['password'];
 
-            $sql ="SELECT *  FROM user where email = '$email' and password = '$password'";
+            $sql ="SELECT *  FROM user where email = '$email'";
             $res = mysqli_query($connection, $sql);
             if (mysqli_num_rows($res)==1){
                 $result = mysqli_fetch_assoc($res);
-                session_start();
-                $_SESSION['user_id'] = $result['id'];
-              header("Location:profile.php");  
-            }
-            else  { 
+                
+                    if( password_verify($password , $result['password']) ==1 ) {
+                      session_start();
+                      $_SESSION['user_id'] = $result['id'];
+                       header("Location:profile.php");
+                    }
+                        
+            } else  { 
                 $errors=' email or password are incorrect ';
                
-            }
+             }
 
             // free memory 
             mysqli_free_result($res);
             // close connection 
-         mysqli_close($connection);
+            mysqli_close($connection);
 
 
 }

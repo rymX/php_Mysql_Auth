@@ -5,18 +5,18 @@
 <style type="text/css">
 .brand{
     background : #55b09c !important;
-    margin : 20px !important;
+    margin : 10px !important;
 }
 .danger{
     background : #990011 !important;
-    font-size : 11px;
+    font-size : 14px;
 }
 .brand-text{
     color :  #55b09c !important;
 }
 form{
     max-width :460px;
-    margin: 20px auto ;
+    margin: 0px 0px !important;
     padding : 20px
 }
 .picture{
